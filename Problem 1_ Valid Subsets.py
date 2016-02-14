@@ -14,11 +14,53 @@ same for repeats, a set {}
 """
 
 ###### All valid loops for set of pairs
+class Loop():
+    def __init__(self, it):
+        self.l= tuple(it)
+    def __len__(self):
+        return len(self.l)
+    def __getitem__(self,key):
+        return self.l[key%len(self)]
+    def __getslice__(self,i,j):
+        assert(type(i)==int and type(j)==int and j>=i)
+        if j<len(self)+1:return lstr(self.l[i:j])
+        else:return lstr(self.l[i::]+self.l[0:j%len(self)])
+
+    def __iter__(self):
+        return self.l.__iter__()
+    def __hash__(self):
+        return self.l.__hash__()
+
+    def __eq__(self, other):
+
+        if len(self.l) != len(other.l): return False
+        find = other[0]
+        pos = -1
+        for i in range(len(self.l)):
+            if self.l[i] == find:
+                pos = i
+        if pos == -1: return False
+        else:
+            for c in range(len(self.l)):
+                if self[i+c] != other[c]: return False
+            return True
+    def __repr__(self): return self.l.__repr__()
+    
+    
+"""""
+ESTABLISH EQUALITY OF LOOPS
+"""
+
+
+    
+        
+
 
 def to_graph(p):
     #p is a list of pairs
-
+               #graph is a dict, keys are pairs, values are sets of neighbors to the key pair
     return { i:set(filter(i.satisfies, p)) for i in p}
+
 
 def connected(node, graph, acc, d):
     nbhs = graph[node]
@@ -26,23 +68,23 @@ def connected(node, graph, acc, d):
     for i in nbhs:
         for j in range(len(acc)):
             if acc[j] == i:
-                if i in d: d[i].add(acc[j+1:])
-                else: d[i] = set([acc[j+1:]])
+                a = Loop(acc[j:])
+                if a not in d:
+                    d.add(a)
                 break
         else:
             connected(i, graph, acc+(i,), d)
     
                    
-        
-
 
 def all_cycles(graph):
-    d = {}
+    d = set()
+    #d = dict {}
     for node in graph:
-        if node not in d:
-            connected(node, graph.copy(),(node,), d)
-
+        connected(node, graph.copy(),(node,), d)
     return d
+
+
 
 def sol_dict(p):
     return all_cycles(to_graph(p))
