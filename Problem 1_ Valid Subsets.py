@@ -184,11 +184,6 @@ def test_t_times(t,n,j): #n pairs for j classes
 
 
 
-######### Part II:  
-
-
-
-
 
 
 
