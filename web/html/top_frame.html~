@@ -1,0 +1,52 @@
+<!-- Top content for google. -->
+<meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="175322907066-1g3k9vba0jji3qi3kf401lg5t8fhk15n.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+  </script>
+</head>
+<body>
+<div id="top">
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <div id="header-links">
+      <a href="#" onclick="signOut();">Sign Out</a>
+    <a href="/index.html">Home</a>
+    <a href="#" onclick="load_pg();">Go to my page!</a>
+    </div>
+    </div>
+    <script>
+      function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        var id_token = googleUser.getAuthResponse().id_token;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:8080/tokensignin');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            console.log('sign out ok');
+        };
+        xhr.send('id_token=' + id_token);
+      };
+      function signOut(){
+          var auth2 = gapi.auth2.getAuthInstance();
+          var id_token = auth2.currentUser.get().getBasicProfile().getId();
+          auth2.signOut().then(function(){
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:8080/tokensignout');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                console.log('sign out OK!');
+            };
+            xhr.send('id_token=' + id_token);
+          });
+      };
+      function load_pg(){
+	  var auth = gapi.auth2.getAuthInstance();
+	  if(auth.isSignedIn.get()){
+	      var tok = auth.currentUser.get().getBasicProfile().getId();
+	      window.open("http://localhost:8080/usr" + tok, "_self");
+	  }else{
+	      alert("Please sign in!")
+	  }
+      }
+    </script>
+</div>

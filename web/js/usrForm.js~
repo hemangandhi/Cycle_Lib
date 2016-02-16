@@ -1,0 +1,11 @@
+//JS
+
+$(document).ready(function(){
+	
+	$('#addReq').click(function(){
+		$('#reqs').append('<div>I want <input type="text" value="a class"></input> <br/>\
+				at waitlist position <input type="text" value="(0 for enrollment)"></input><br/>\
+				and I\'ll give up <input type="text" value="this class"></input><br/>\
+				at waitlist position <input type="text" value="(0 for enrollement)"></input>');
+	});
+});
