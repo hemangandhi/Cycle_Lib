@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title id="title">User Page</title>
+		<link rel="stylesheet" href="lib/jquery-ui.min.css"></link>
+		{uobj}
+		{{gTop}}
+		<script type="text/javascript" src="lib/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="UsrForm.js"></script>
+		<div id="uform">
+			<div id="reqs">
+				<div id="fst">I want <input type="text" class="wantC" value="a class"></input> <br/>
+				at waitlist position <input type="text" class="wantP" value="(0 for enrollment)"></input><br/>
+				and I'll give up <input type="text" class="haveC" value="this class"></input><br/>
+				at waitlist position <input type="text" class="haveP" value="(0 for enrollement)"></input>.</div>
+			</div>
+
+			<input type="button" id="addReq" value="Add a request"></input>
+			<input type="button" id="submit" value="Submit"></input>
+		</div>
+
+		<div id="accord">
+			{uinfo}
+		</div>
+	</body>
+</html>
