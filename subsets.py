@@ -13,10 +13,14 @@ same for repeats, a set {}
 
 """
 
+def rotate(l, v):
+    return l[v:] + l[:v]
+
 ###### All valid loops for set of pairs
 class Loop():
     def __init__(self, it):
-        self.l= tuple(it)
+        idx, v = min(enumerate(it), key = lambda x: x[1])
+        self.l= rotate(tuple(it), idx)
     def __len__(self):
         return len(self.l)
     def __getitem__(self,key):
