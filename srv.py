@@ -10,6 +10,10 @@ CLIENT_ID = "175322907066-1g3k9vba0jji3qi3kf401lg5t8fhk15n.apps.googleuserconten
 users = set()
 
 def verify_token(token):
+  """
+  Verifies an authentication token from Google.
+  Found online with Google oauth tips.
+  """
   try:
     idinfo = client.verify_id_token(token, CLIENT_ID)
     if idinfo['aud'] != CLIENT_ID: #WEB_CLIENT_ID is CLIENT_ID...
@@ -25,6 +29,11 @@ def verify_token(token):
     return idinfo['sub']
 
 def load_pg(loc, isFile=True):
+  """
+  Formats a page.
+  Expects the text file or string to contain {gTop}
+  {gTop} will be substituted for the contents of top_frame.html.
+  """
   if isFile:
     with open(loc) as f:
       return load_pg(f.read(), False)
@@ -32,13 +41,17 @@ def load_pg(loc, isFile=True):
       return loc.format(gTop = t.read())
 
 def gen_usr_pg(uid):
+  """
+  Makes a user's page.
+  Loads all their pairs and all those in a cycle.
+  """
   if uid not in users:
     return load_pg("<html><head>{gTop}<h1>Sign in!</h1></body></html>", False)
   
   with open('web/html/usr_template.html') as f:
     lInf = util.usr_sets(uid)
     dInf = dict()
-    for i in lInf:
+    for i in lInf:#This loads dInf into the format {pair from user: [{set: the cycle that satisfies, votes: all voters}]}
       for j in range(len(i['set'])):
         if i['set'][j].id != uid:
           continue
@@ -50,7 +63,7 @@ def gen_usr_pg(uid):
     uInf = ""
     uObj = "<script> var db = {{"
     ctr = util.counter()
-    for i in dInf:
+    for i in dInf:#this loop takes everything and formats it into HTML for easy reading by users.
       v = {'haveName': i.have.name, 'havePos': i.have.position, 'wantName': i.want.name, 'wantPos': i.want.position}
       uInf += "<h3>Giving up {haveName} at {havePos} for {wantName} at {wantPos}.</h3>\n".format(**v)
       uInf += "<div>This can be done by:\n<ul>"    
@@ -85,14 +98,21 @@ def gen_usr_pg(uid):
 
 class WaitListReq(srv.SimpleHTTPRequestHandler):
   def send_content(self, txt, c_type = 'text/plain'):
+    """
+    Sends arbitrary content to the client.
+    """
     self.send_header('content-type',c_type)
     self.send_header('content-length',str(len(txt)))
     self.end_headers()
     self.wfile.write(txt.encode('utf-8'))
 
   def do_POST(self):
+    """
+    Handles a HTTP POST.
+    """
     ctype, p = cgi.parse_header(self.headers['Content-Type'])
     if ctype == 'application/x-www-form-urlencoded' and self.path == "/tokensignin":
+      #Handles a user's sign-in.
       l = int(self.headers['Content-Length'])
       postvars = cgi.parse_qs(self.rfile.read(l), keep_blank_values = 1)
       ver = verify_token(postvars[b'id_token'][0])
@@ -105,6 +125,7 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
         self.send_response(400)
         self.send_content("None")
     elif ctype == 'application/x-www-form-urlencoded' and self.path == "/tokensignout":
+      #Handles a user's sign-out.
       l = int(self.headers['Content-Length'])
       postvars = cgi.parse_qs(self.rfile.read(l), keep_blank_values = 1)
       if postvars[b'id_token'][0] in users:
@@ -113,6 +134,7 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
       self.send_content("None")
     
     elif ctype == 'application/json' and self.path =='/vote':
+      #Handles a user's vote. Sends back the new vote count.
       dt = self.rfile.read(int(self.headers['content-length'])).decode('utf-8')
       dt = util.load_vote(dt)
       if dt > 0:
@@ -121,6 +143,7 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
         self.send_response(400)
       self.send_content(str(dt))
     elif ctype == 'application/json' and self.path == '/swap':
+      #Handles the user demanding to swap classes.
       dt = self.rfile.read(int(self.headers['content-length'])).decode('utf-8')
       dt = util.update_pairs(dt)
       if dt:
@@ -133,6 +156,8 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
       self.send_content(load_pg("<html><head>{gTop}<h1>Page not found!</h1></body></html>", False), "text/html")
 
   def do_GET(self):
+    """Handles a HTTP GET."""
+    #Creates a user's page based on their UID.
     if self.path.startswith('/usr'):
       id = int(self.path[len('/usr'):])
       pg = gen_usr_pg(id)
@@ -140,9 +165,11 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
       self.send_content(pg, "text/html")
       return
 
+    #Special redirection for '/': go to /web/html/index.html
     if self.path in ['/', '']:
       self.path = '/index.html'
     
+    #Edits the path to handle the file structure.
     if self.path.endswith('.html'):
       self.path = '/web/html' + self.path
     elif self.path.endswith('.js'):
@@ -154,7 +181,7 @@ class WaitListReq(srv.SimpleHTTPRequestHandler):
     if os.path.exists(q) and srv.SimpleHTTPRequestHandler.guess_type(self, self.path) == "text/html":
       self.send_response(200)
       self.send_content(load_pg(q), "text/html")
-    else:
+    else:#defer to the standard get response, here...
       srv.SimpleHTTPRequestHandler.do_GET(self)
 
     

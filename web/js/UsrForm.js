@@ -10,8 +10,10 @@ $(document).ready(function(){
 
 	$('#accord').accordion({collapsible: true});
 
+        //Refesh every 10 minutes.
 	setTimeout(function(){window.location.reload(true);}, 1000*60*10);
 	
+        //Add a request to the form.
 	$('#addReq').click(function(){
 		$('#reqs').append('<div>I want <input type="text" class="wantC" value="a class"></input> <br/>\
 				at waitlist position <input type="text" class="wantP" value="(0 for enrollment)"></input><br/>\
@@ -19,6 +21,7 @@ $(document).ready(function(){
 				at waitlist position <input type="text" class="wantC" value="(0 for enrollement)"></input>.</div>');
 	});
 
+        //Vote on a certain cycle.
 	$('.vote').click(function(){
 		var $id = $(this).attr('id');
 		console.log($id + ' clicked');
@@ -36,6 +39,7 @@ $(document).ready(function(){
                 xhr.send(JSON.stringify({idx:db[$id], uid:uid}));
 	});
 
+        //Submit a list of requests
 	$('#submit').click(function(){
 		var uid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
 		var vals = [];
@@ -50,7 +54,7 @@ $(document).ready(function(){
 				alert("Invalid entry with wanting " + c2 + " for " + c1);
 				bd = true;
 			}else
-				vals.push({__Pair__: true,
+				vals.push({__Pair__: true, //Encodes the request to the python encoding of a Pair object.
 					  have: {__Desire__:true, name:c1, position:w1}, 
 					  want: {__Desire__:false, name:c2, position:w2},
 					  id: uid})
