@@ -1,9 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-	{gTop}
+    <head> </head>
+    <body class="centered-wrapper">
+    <div class="centered-content">
+	    <h1 style="text-align:center;"> Welcome to Waitlist Exchange!</h1>
+        <hr></hr>
+        <h2> What is it? </h2>
+            <p>
+            Often times we college students get waitlisted for classes we want.             To solve this, we trade classes with a friend. I got waitlisted for             Biology but don't care much for my Physics course. Bob, a friend of mine got waitlisted for Physics but got into a Biology course. I can give Bob my Physics course and he can give me his Biology course and we can both be happy. 
+            <br></br>
+            I doesn't have to end there. There can be trades of 3, 4, 5, ..., n people. Amy can give some course to Bob, Bob to Carl, Carl to Dave, Dave to Elenor and so on until some person Nancy gives a course to Bob.
+            </p>
+        <h2>How You Can Use It</h2>
+            
+                
 
-	<h1> Test </h1>
-	</body>
+            <p>
+            You can use this by logging in to your google account and then reporting pairs of trading. You give us a set of pairs of the form (class I have and am willing to trade, class I don't have or am waitlisted for) and we show you for each pair, all possible n-people trades. You then vote on these trades and if everyone agrees, a mass email is sent out.
+            </p>
+                
+                {gTop}
+
+            <hr></hr>
+        <h2>Underneath The Hood</h2>
+            <p>
+                In case you are interested, underneath the hood, we essentially solve the problem of finding all loops in a directed graph (or digraph).
+            
+            </p>
+            <p style="text-align:center;">
+            <img src="Digraph.jpg" width="700" ></img>
+            </p>
+
+    </div>
+    </body>
 
 </html>
