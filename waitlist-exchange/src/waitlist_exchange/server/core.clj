@@ -18,18 +18,33 @@
                                       (wle-html/gen-page true 
                                                          (get-in (friend/current-authentication req) 
                                                                  [:user :name]))))
-  (friend/logout (GET "/logout" [] (wle-html/gen-page false ""))))
+  (friend/logout (GET "/logout" req (wle-html/gen-page false "")))
+  (GET "/mk-account" [] (wle-html/gen-page false "" :body-fn wle-html/make-acc-body))
+  (POST "/submit-account" req (if (apply wle-udb/add-user (let [[email name pass] 
+                                                                (vals (assoc-in 
+                                                                        (:params req) 
+                                                                        [:password]
+                                                                        (creds/hash-bcrypt (:password 
+                                                                                             (:params req)))))]
+                                                            [name email pass]))
+                                (friend/merge-authentication (resp/redirect "/utest") 
+                                                               {:identity (get-in req [:params :email]) 
+                                                                :roles #{::user} 
+                                                                :user (@wle-udb/users (get-in req [:params :email]))})
+                                (wle-html/gen-page false "" :body-fn #(wle-html/make-acc-body :more-info [:p "This user already exists!"])))))
 
-(defn wle-cred-fn [{:keys [email password] :as creds}]
+(defn wle-cred-fn [{:keys [email password] :as c-creds}]
   (when-let [usr (@wle-udb/users email)]
-    (when (= (creds/hash-bcrypt password) (usr :password))
+    (when (creds/bcrypt-verify password (str (usr :password)))
       {:identity email :roles #{::user} :user usr})))
 
 (defn wle-auth-wkflow [req]
   (when (and (= (:request-method req) :post)
              (= (:uri req) "/login"))
     (let [cred-fn (get-in req [::friend/auth-config :credential-fn])]
-      (make-auth (cred-fn (select-keys (:params req) [:email :password]))))))
+      (if-let [auth (cred-fn (select-keys (:params req) [:email :password]))]
+        (friend/merge-authentication (resp/redirect "/utest") auth)
+        (wle-html/gen-page false "" :body-fn #(vec [:p "Invalid login!"]))))))
 
 (defn start-srv []
   (run-jetty (-> main-app

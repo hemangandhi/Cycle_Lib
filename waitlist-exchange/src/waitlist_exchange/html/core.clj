@@ -27,6 +27,7 @@
     [:div#navbar-content.collapse.navbar-collapse
       (if is-logged-in
         [:ul.navbar-nav.nav
+         [:li [:a.btn.btn-warning {:href "logout"} "Logout"]]
          [:li.active [:a {:href "/my-trades"} "Possible Trades"]]
          [:li [:a {:href "/add-info"} "Add Requests"]]]
         [:ul.navbar-nav.nav
@@ -40,14 +41,32 @@
               [:form.form {:role "form" :method "post" :action "login"}
                [:div.form-group
                 [:label.sr-only {:for "email-entry"} "Email Address"]
-                [:input#email-entry.form-control {:type "email" :placeholder "Email address" :required true}]]
+                [:input#email-entry.form-control {:type "email" :name "email" :placeholder "Email address" :required true}]]
                [:div.form-group
                 [:label.sr-only {:for "passwd-entry"} "Password"]
-                [:input#email-entry.form-control {:type "password" :placeholder "Password" :required true}]]
+                [:input#email-entry.form-control {:type "password" :name "password" :placeholder "Password" :required true}]]
                [:div.form-group
-                [:submit.form-control.btn.btn-primary "Login"]]]]]]]]])]]])
+                [:button.form-control.btn.btn-primary {:type "submit"} "Login"]]]]]]]]])]]])
 
-(defn gen-page [is-logged-in uname]
+(defn gen-page [is-logged-in uname & {:keys [body-fn] :or {body-fn (fn [] (vec [:p "test"]))}}]
   (h/html5 (if is-logged-in (head-tag uname) (head-tag))
            [:body (concat [(navbar is-logged-in)]
-                          [[:p "Test"]])]))
+                          [(body-fn)])]))
+
+(defn make-acc-body [& {:keys [more-info] :or {more-info [:p "Please provide the follwing"]}}]
+  [:div more-info
+         [:form.form {:role "form" :method "post" :action "submit-account"}
+          [:div.form-group
+           [:label.sr-only {:for "email-mk"} "Enter your email:"]
+           [:input#email-mk.form-control {:type "email" :name "email" :placeholder "Your email" :required true}]]
+          [:div.form-group
+           [:label.sr-only {:for "name-mk"} "Enter your username:"]
+           [:input#name-mk.form-control {:type "text" :name "name" :placeholder "Your name" :required true}]]
+          [:div.form-group
+           [:label.sr-only {:for "password-mk"} "Enter your password:"]
+           [:input#password-mk.form-control {:type "password" :name "password" :placeholder "Password" :required true}]]
+          [:div.form-group
+           [:label.sr-only {:for "password-conf"} "Confirm your password"]
+           [:input#password-conf.form-control {:type "password" :placeholder "Confirm password" :required true}]]
+          [:div.form-group
+           [:button.form-control.btn.btn-primary {:type "submit"} "Make an Account!"]]]])

@@ -8,16 +8,16 @@
       (read rdr))))
 
 (defn write-to-file [filename data]
-  (spit filename (pr data)))
+  (spit filename (with-out-str (pr data))))
 
 (def default-path (io/resource "db/"))
 
 (defn write-user-info [info]
-  (write-to-file (str default-path "user-db.edn")))
+  (write-to-file (str default-path "user-db.edn") info))
 
 (defn load-users [] (read-from-file (str default-path "user-db.edn")))
 
 (defn write-cycles [cycles]
-  (write-to-file (str default-path "cycles.edn")))
+  (write-to-file (str default-path "cycles.edn") cycles))
 
 (defn load-cycles [] (read-from-file (str default-path "cycles.edn")))
