@@ -70,3 +70,7 @@
            [:input#password-conf.form-control {:type "password" :placeholder "Confirm password" :required true}]]
           [:div.form-group
            [:button.form-control.btn.btn-primary {:type "submit"} "Make an Account!"]]]])
+
+(defn login-fail-body []
+  [:p "We could not find that account!"
+   [:a {:href "/mk-account"} "Don't have an account?"]])

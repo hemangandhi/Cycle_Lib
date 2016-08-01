@@ -14,10 +14,11 @@
       
 (defroutes main-app
   (GET "/" req (wle-html/gen-page false ""))
-  (GET "/utest" req (friend/authorize #{::user} 
+  (GET "/my-trades" req (friend/authorize #{::user} 
                                       (wle-html/gen-page true 
                                                          (get-in (friend/current-authentication req) 
                                                                  [:user :name]))))
+  (GET "/bad-login" req (wle-html/gen-page false "" :body-fn wle-html/login-fail-body))
   (friend/logout (GET "/logout" req (wle-html/gen-page false "")))
   (GET "/mk-account" [] (wle-html/gen-page false "" :body-fn wle-html/make-acc-body))
   (POST "/submit-account" req (if (apply wle-udb/add-user (let [[email name pass] 
@@ -27,7 +28,7 @@
                                                                         (creds/hash-bcrypt (:password 
                                                                                              (:params req)))))]
                                                             [name email pass]))
-                                (friend/merge-authentication (resp/redirect "/utest") 
+                                (friend/merge-authentication (resp/redirect "/my-trades") 
                                                                {:identity (get-in req [:params :email]) 
                                                                 :roles #{::user} 
                                                                 :user (@wle-udb/users (get-in req [:params :email]))})
@@ -43,8 +44,8 @@
              (= (:uri req) "/login"))
     (let [cred-fn (get-in req [::friend/auth-config :credential-fn])]
       (if-let [auth (cred-fn (select-keys (:params req) [:email :password]))]
-        (friend/merge-authentication (resp/redirect "/utest") auth)
-        (wle-html/gen-page false "" :body-fn #(vec [:p "Invalid login!"]))))))
+        (friend/merge-authentication (resp/redirect "/my-trades") auth)
+        (resp/redirect "/bad-login")))))
 
 (defn start-srv []
   (run-jetty (-> main-app
