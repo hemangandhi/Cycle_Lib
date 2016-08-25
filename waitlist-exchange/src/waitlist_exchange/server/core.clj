@@ -1,6 +1,6 @@
 (ns waitlist-exchange.server.core
   (:require [cemerick.friend :as friend]
-            [waitlist-exchange.db.user-db :as wle-udb]
+            [waitlist-exchange.db.core :as wle-udb]
             [cemerick.friend.workflows :refer (make-auth)]
             [cemerick.friend.credentials :as creds]
             [compojure.core :refer (GET POST routes defroutes)]
@@ -21,21 +21,21 @@
   (GET "/bad-login" req (wle-html/gen-page false "" :body-fn wle-html/login-fail-body))
   (friend/logout (GET "/logout" req (wle-html/gen-page false "")))
   (GET "/mk-account" [] (wle-html/gen-page false "" :body-fn wle-html/make-acc-body))
-  (POST "/submit-account" req (if (apply wle-udb/add-user (let [[email name pass] 
-                                                                (vals (assoc-in 
-                                                                        (:params req) 
-                                                                        [:password]
-                                                                        (creds/hash-bcrypt (:password 
-                                                                                             (:params req)))))]
-                                                            [name email pass]))
+  (POST "/submit-account" req (if-let [usr (apply wle-udb/add-user (let [[email name pass] 
+                                                                        (vals (assoc-in 
+                                                                                (:params req) 
+                                                                                [:password]
+                                                                                (creds/hash-bcrypt (:password 
+                                                                                                   (:params req)))))]
+                                                                     [name email pass]))]
                                 (friend/merge-authentication (resp/redirect "/my-trades") 
                                                                {:identity (get-in req [:params :email]) 
                                                                 :roles #{::user} 
-                                                                :user (@wle-udb/users (get-in req [:params :email]))})
+                                                                :user usr})
                                 (wle-html/gen-page false "" :body-fn #(wle-html/make-acc-body :more-info [:p "This user already exists!"])))))
 
 (defn wle-cred-fn [{:keys [email password] :as c-creds}]
-  (when-let [usr (@wle-udb/users email)]
+  (when-let [usr (wle-udb/users email)]
     (when (creds/bcrypt-verify password (str (usr :password)))
       {:identity email :roles #{::user} :user usr})))
 
