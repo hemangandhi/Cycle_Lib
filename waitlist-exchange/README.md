@@ -33,6 +33,18 @@ Any N/A would 404. An exchange is a node. A trade is a cycle.
 |/cycles/lock| All the locked cycles | N/A | Locks a list of nodes | N/A |
 |/cycles/state/:id | The state of locked trade (defaults to deleted) | N/A | Updates the trade state | Deletes the trade |
 
+The nodes are JSON objects with:
+* UID: the user ID provided.
+* have: some string for the have provided.
+* haveValue: some integer value for the have.
+* want: some string for the want provided.
+* wantValue: some integer value for the want.
+* ID: the ID of the node (for faster future querying)
+
+Cycles are JSON objects with:
+* cycle: an array of node IDs.
+
+A lock request (POST to /cycles/lock) must have a list of node IDs and will return `{key: ###}` where /cycles/state/### will maintain the state for that locked trade.
 ## License
 
 Copyright © 2016 FIXME
