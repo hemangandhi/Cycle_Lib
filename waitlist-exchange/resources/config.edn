@@ -1,0 +1,4 @@
+{
+:cycl-lib-usr {:name "cyclist" :password "$10$cvTbrliBJOhN7T81bPdddeFxIb4V/AZt40xAvCFXSyg2tnuM4NhCa"}
+:neo4j-usr {:name "neo4j" :password "!wannaNeo4j"}
+}

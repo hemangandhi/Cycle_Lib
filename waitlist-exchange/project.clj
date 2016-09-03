@@ -9,5 +9,4 @@
                  [clojurewerkz/neocons "3.1.0"]
                  [ring/ring-jetty-adapter "1.4.0"]
                  [com.cemerick/friend "0.2.3"]
-                 [compojure "1.5.1"]
-                 [hiccup "1.0.5"]])
+                 [compojure "1.5.1"])

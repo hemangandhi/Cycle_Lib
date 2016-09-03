@@ -1,10 +1,16 @@
-# waitlist-exchange
+# Cycle-lib
 
-A Clojure library designed to ... well, that part is up to you.
+Find cycles in a graph!
 
-## Usage
+## As a REST API...
 
-FIXME
+Any N/A would 404.
+
+|URL           |GET                                     |PUT       |POST                   |DELETE                              |
+|--------------|----------------------------------------|----------|-----------------------|------------------------------------|
+|/user/:id     | All the cycles for the user            | Add user | Add exchange for user | Remove user                        |
+|/user/:id/:tag| All the cycles with a certain tag      | N/A      | N/A                   | Removes the exchanges with the tag |
+|/login        | Whether you're logged in               | N/A      | Log in                | N/A                                |
 
 ## License
 

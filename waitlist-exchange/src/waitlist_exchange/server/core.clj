@@ -9,8 +9,7 @@
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
-            [waitlist-exchange.html.core :as wle-html]))
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]))
       
 (defroutes main-app
   (GET "/" req (wle-html/gen-page false ""))
